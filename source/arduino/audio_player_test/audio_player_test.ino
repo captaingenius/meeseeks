@@ -32,6 +32,10 @@
 #define SHIELD_RESET  -1      // VS1053 reset pin (unused!)
 #define SHIELD_CS     7      // VS1053 chip select pin (output)
 #define SHIELD_DCS    6      // VS1053 Data/command select pin (output)
+// These are the pins used for the music maker shield while using Pro Trinket 5V
+#define TRINK_SHIELD_RESET  -1      // VS1053 reset pin (unused!)
+#define TRINK_SHIELD_CS     6      // VS1053 chip select pin (output)
+#define TRINK_SHIELD_DCS    5      // VS1053 Data/command select pin (output)
 
 // These are common pins between breakout and shield
 #define CARDCS 4     // Card chip select pin
@@ -42,22 +46,32 @@ Adafruit_VS1053_FilePlayer musicPlayer =
   // create breakout-example object!
   //Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
   // create shield-example object!
-  Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+  //Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+  Adafruit_VS1053_FilePlayer(TRINK_SHIELD_RESET, TRINK_SHIELD_CS, TRINK_SHIELD_DCS, DREQ, CARDCS);  
   
 void setup() {
   Serial.begin(9600);
   Serial.println("Adafruit VS1053 Simple Test");
-
-  if (! musicPlayer.begin()) { // initialise the music player
+  pinMode(8, OUTPUT);
+   
+  if (!musicPlayer.begin()) { // initialise the music player
      Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
-     while (1);
+     while (1);  // don't do anything more
   }
   Serial.println(F("VS1053 found"));
-  
+
+  //Flash LED to show that music player was connected
+  quickLEDFlash();
+  delay(2000);
+    
    if (!SD.begin(CARDCS)) {
     Serial.println(F("SD failed, or not present"));
     while (1);  // don't do anything more
   }
+
+  //Flash LED to show that SD card was connected
+  quickLEDFlash();
+  delay(2000);
 
   // list files
   printDirectory(SD.open("/"), 0);
@@ -131,5 +145,15 @@ void printDirectory(File dir, int numTabs) {
     }
     entry.close();
   }
+}
+
+void quickLEDFlash(){
+  digitalWrite(8, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(100);                       // wait for a second
+  digitalWrite(8, LOW);    // turn the LED off by making the voltage LOW
+  delay(100); 
+  digitalWrite(8, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(100);                       // wait for a second
+  digitalWrite(8, LOW);    // turn the LED off by making the voltage LOW
 }
 
